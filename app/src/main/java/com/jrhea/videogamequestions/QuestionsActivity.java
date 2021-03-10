@@ -104,8 +104,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
 
     /**
-     * readQuestions - A lot of the game is set up here.
-     *
+     * readQuestions - The app reads a random line from questions.txt
      */
     public void readQuestion() {
 
@@ -115,6 +114,8 @@ public class QuestionsActivity extends AppCompatActivity {
             //questionLine = reader.readLine();
 
             looper = 0;
+            //while loop to put all the lines from the txt file into an array.
+            //if totalQuestions = 0, then all questions are answered
             while (looper < totalQuestions) {
 
                 questionLine = reader.readLine();
@@ -129,6 +130,10 @@ public class QuestionsActivity extends AppCompatActivity {
         }//end catch
     }//end readQuestion()
 
+    /**
+     * getQuestion() - The app picks a random element from lineArray[], parses it, and puts the
+     * pieces in their correct places. More information in the method.
+     */
     public void getQuestion(){
         //random number to pick the question
         if(totalQuestions - 1 != 0) {
@@ -139,7 +144,7 @@ public class QuestionsActivity extends AppCompatActivity {
             randomNumber = 0;
         }//end else
 
-
+        //sub 1 so random numbers outside of index range won't happen when lineArray[] is trimmed
         totalQuestions--;
         questionSelected = lineArray[randomNumber];
         trimArray();
@@ -148,8 +153,9 @@ public class QuestionsActivity extends AppCompatActivity {
         //split the question and answers by commas
         tokens = questionSelected.split(",");
 
+        //index 0 is always the question
         question = tokens[0];
-        //the first answer is always the correct answer (the second string parsed (is parsed a word?))
+        //the first answer (index 1) is always the correct answer (the second string parsed (is parsed a word?))
         correctAnswer = tokens[1];
 
         //store the 4 answers into the answers array
@@ -190,7 +196,6 @@ public class QuestionsActivity extends AppCompatActivity {
      * answer1Pressed - onClick for when the top answer button is pressed
      * @param view The button being pressed
      */
-
     public void answer1Pressed(View view) {
         //disable the buttons after an answer has been picked
         answer1Button.setEnabled(false);
@@ -220,6 +225,8 @@ public class QuestionsActivity extends AppCompatActivity {
                         answer2Button.setEnabled(true);
                         answer3Button.setEnabled(true);
                         answer4Button.setEnabled(true);
+
+                        //select a new question
                         getQuestion();
                         setTexts();
                     }//end if
@@ -235,7 +242,7 @@ public class QuestionsActivity extends AppCompatActivity {
             resultText.setText(result);
 
             //three second timer after an answer is selected.
-            //if incorrect, (display the score now. Add a screen to restart or go back to MainActivity later)
+            //if incorrect, display the score
             new CountDownTimer(3000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -249,7 +256,6 @@ public class QuestionsActivity extends AppCompatActivity {
                     returnToStartButton.setVisibility(View.VISIBLE);
                 }
             }.start();
-
         }//end else
 
     }//end answer1Pressed
@@ -315,7 +321,6 @@ public class QuestionsActivity extends AppCompatActivity {
     }//end answer2Pressed
 
     public void answer3Pressed(View view) {
-
         //disable the buttons after an answer has been picked
         answer1Button.setEnabled(false);
         answer2Button.setEnabled(false);
@@ -376,7 +381,6 @@ public class QuestionsActivity extends AppCompatActivity {
     }//end answer3Pressed
 
     public void answer4Pressed(View view) {
-
         //disable the buttons after an answer has been picked
         answer1Button.setEnabled(false);
         answer2Button.setEnabled(false);
@@ -445,7 +449,7 @@ public class QuestionsActivity extends AppCompatActivity {
     /**
      * playMusic plays Allegro from Phoenix Wright: Ace Attorney (2001)
      * The music will continue to loop until stopPlayer is called, which is called when the return
-     * to start button is pressed.
+     * to start button is pressed OR the app is stopped, paused, or destroyed.
      */
     public void playMusic() {
 
@@ -462,7 +466,8 @@ public class QuestionsActivity extends AppCompatActivity {
     }//end play
 
     /**
-     * stopPlayer simply stops the music when return to start is hit
+     * stopPlayer simply stops the music when return to start is hit or
+     * app is stopped, paused, or destroyed.
      */
     public void stopPlayer() {
 
@@ -472,6 +477,11 @@ public class QuestionsActivity extends AppCompatActivity {
         }//end if
     }//end stopPlayer
 
+    /**
+     * trimArray - trims lineArray[] so that the app can do two things.
+     * 1) Remove the current question from lineArray[] so it can't be used again
+     * 2) Trim the array size by 1 so there is no null indexes
+     */
     public void trimArray(){
 
         int i = 0;
@@ -490,6 +500,8 @@ public class QuestionsActivity extends AppCompatActivity {
         lineArray = tempLineArray;
     }//end trimArray
 
+    //Lifecycle Events to stop music
+
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void pauseApp(){
 
@@ -503,6 +515,7 @@ public class QuestionsActivity extends AppCompatActivity {
         stopPlayer();
     }//end destroyApp
 
+    //resume music when app is resumed
     @Override
     protected void onResume(){
         super.onResume();
@@ -511,6 +524,7 @@ public class QuestionsActivity extends AppCompatActivity {
         }//end if
     }//end onResume
 
+    //destroys app when back is pressed (change in the future to prevent accidental hits?)
     @Override
     public void onBackPressed(){
 
